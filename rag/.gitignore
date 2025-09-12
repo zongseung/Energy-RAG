@@ -1,0 +1,18 @@
+# Python-generated files
+__pycache__/
+build/
+dist/
+wheels/
+*.egg-info
+*.env
+
+# Virtual environments
+.venv
+.db
+.venv
+.__pycache__
+logs
+
+# 데이터 폴더 추적 금지
+naverDB
+energy_statistic

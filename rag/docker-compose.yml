@@ -1,0 +1,48 @@
+services:
+  postgres_db1:
+    image: ankane/pgvector:latest   # ✅ pgvector 올바른 태그
+    container_name: rag-postgres_db1-1
+    environment:
+      - POSTGRES_USER=zongseung
+      - POSTGRES_PASSWORD=1234
+      - POSTGRES_DB=naver
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - rag-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U zongseung -d naver"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  db_init:
+    build:
+      context: .
+      dockerfile: db_init/Dockerfile   # ✅ 경로 명확히 지정
+    depends_on:
+      postgres_db1:
+        condition: service_healthy
+    networks:
+      - rag-network
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.app
+    ports:
+      - "8501:8501"
+    depends_on:
+      - postgres_db1
+    volumes:
+      - .:/app
+    network_mode: "host"
+
+networks:
+  rag-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
